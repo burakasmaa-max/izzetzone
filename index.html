@@ -1,0 +1,1391 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>English Fun Lab 🎓</title>
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&family=Fredoka+One&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #f0f4ff;
+  --shadow: 0 8px 32px rgba(80,80,180,0.10);
+  --radius: 18px;
+  --green: #22c55e;
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: 'Nunito', sans-serif; background: var(--bg); min-height: 100vh; padding-bottom: 40px; }
+
+.app-header {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  padding: 24px 20px 20px; text-align: center; color: white;
+  position: relative; overflow: hidden;
+}
+.app-header::before {
+  content: ''; position: absolute; width: 300px; height: 300px;
+  background: rgba(255,255,255,0.07); border-radius: 50%; top: -100px; right: -80px;
+}
+.app-title { font-family: 'Fredoka One', cursive; font-size: 2.2rem; letter-spacing: 1px; text-shadow: 0 2px 8px rgba(0,0,0,0.2); }
+.app-subtitle { font-size: 0.95rem; opacity: 0.85; margin-top: 4px; }
+.score-bar { display: flex; justify-content: center; gap: 16px; margin-top: 14px; flex-wrap: wrap; }
+.score-badge { background: rgba(255,255,255,0.18); border-radius: 30px; padding: 6px 18px; font-size: 0.95rem; font-weight: 700; color: white; backdrop-filter: blur(4px); }
+
+.tabs-container { max-width: 960px; margin: 24px auto 0; padding: 0 16px; }
+.tabs-scroll { display: flex; gap: 8px; overflow-x: auto; padding-bottom: 4px; scrollbar-width: none; }
+.tabs-scroll::-webkit-scrollbar { display: none; }
+.tab-btn {
+  flex-shrink: 0; padding: 10px 20px; border-radius: 40px; border: 2.5px solid transparent;
+  cursor: pointer; font-family: 'Nunito', sans-serif; font-size: 0.92rem; font-weight: 800;
+  transition: all 0.22s ease; background: white; color: #555;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.07); display: flex; align-items: center; gap: 6px;
+}
+.tab-btn:hover { transform: translateY(-2px); box-shadow: 0 6px 18px rgba(0,0,0,0.12); }
+.tab-btn.active { color: white; transform: translateY(-2px); box-shadow: 0 6px 18px rgba(0,0,0,0.2); }
+
+.tab-btn[data-topic="adverbs"]       { border-color: #22c55e; color: #16a34a; }
+.tab-btn[data-topic="time"]          { border-color: #3b82f6; color: #1d4ed8; }
+.tab-btn[data-topic="tenses"]        { border-color: #8b5cf6; color: #6d28d9; }
+.tab-btn[data-topic="can"]           { border-color: #f59e0b; color: #d97706; }
+.tab-btn[data-topic="tobe"]          { border-color: #ec4899; color: #be185d; }
+.tab-btn[data-topic="vocab"]         { border-color: #14b8a6; color: #0f766e; }
+.tab-btn[data-topic="adverbs"].active  { background: linear-gradient(135deg,#22c55e,#16a34a); }
+.tab-btn[data-topic="time"].active     { background: linear-gradient(135deg,#3b82f6,#1d4ed8); }
+.tab-btn[data-topic="tenses"].active   { background: linear-gradient(135deg,#8b5cf6,#6d28d9); }
+.tab-btn[data-topic="can"].active      { background: linear-gradient(135deg,#f59e0b,#d97706); }
+.tab-btn[data-topic="tobe"].active     { background: linear-gradient(135deg,#ec4899,#be185d); }
+.tab-btn[data-topic="vocab"].active    { background: linear-gradient(135deg,#14b8a6,#0f766e); }
+
+.game-area { max-width: 960px; margin: 20px auto 0; padding: 0 16px; }
+.game-top { display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px; flex-wrap: wrap; gap: 8px; }
+.sentence-counter { font-size: 0.9rem; font-weight: 700; color: #888; background: white; padding: 6px 14px; border-radius: 20px; box-shadow: var(--shadow); }
+.nav-buttons { display: flex; gap: 8px; }
+.nav-btn { padding: 8px 20px; border-radius: 20px; border: none; cursor: pointer; font-family: 'Nunito', sans-serif; font-weight: 800; font-size: 0.9rem; transition: all 0.2s; background: linear-gradient(135deg,#667eea,#764ba2); color: white; box-shadow: 0 3px 10px rgba(102,126,234,0.3); }
+.nav-btn:hover { transform: translateY(-2px); }
+.hint-btn { background: linear-gradient(135deg,#f59e0b,#ef4444); box-shadow: 0 3px 10px rgba(245,158,11,0.3); }
+
+.drop-zone { min-height: 80px; background: white; border: 3px dashed #c7d2fe; border-radius: var(--radius); display: flex; flex-wrap: wrap; align-items: center; justify-content: center; gap: 8px; padding: 16px; margin-bottom: 16px; transition: all 0.3s ease; box-shadow: var(--shadow); }
+.drop-zone.correct { border-color: var(--green); border-style: solid; background: #f0fdf4; box-shadow: 0 0 0 4px rgba(34,197,94,0.15); animation: correctPulse 0.5s ease; }
+@keyframes correctPulse { 0%{transform:scale(1)} 50%{transform:scale(1.015)} 100%{transform:scale(1)} }
+.placeholder-text { color: #c7d2fe; font-size: 1rem; font-weight: 600; }
+
+.word-pool { display: flex; flex-wrap: wrap; gap: 8px; justify-content: center; min-height: 52px; padding: 10px 0; margin-bottom: 16px; }
+
+.word-card { padding: 9px 18px; border-radius: 30px; font-size: 1rem; font-weight: 700; cursor: pointer; transition: all 0.18s ease; user-select: none; border: 2.5px solid; box-shadow: 0 3px 8px rgba(0,0,0,0.07); background: white; }
+.word-card:hover { transform: translateY(-3px); box-shadow: 0 7px 16px rgba(0,0,0,0.12); }
+.word-card:active { transform: translateY(0); }
+.word-card.in-answer { color: white !important; }
+
+.translation-card { background: white; border-radius: var(--radius); padding: 24px 28px; box-shadow: var(--shadow); margin-top: 6px; }
+.translation-label { font-size: 0.75rem; font-weight: 800; text-transform: uppercase; letter-spacing: 2px; color: #aaa; margin-bottom: 12px; }
+.sentence-display { font-size: 1.5rem; font-weight: 800; line-height: 1.8; margin-bottom: 4px; display: flex; flex-wrap: wrap; gap: 4px; align-items: baseline; }
+.sentence-display .w { border-radius: 6px; padding: 2px 7px; }
+.tr-display { font-size: 1.25rem; font-weight: 700; color: #555; display: flex; flex-wrap: wrap; gap: 4px; align-items: baseline; }
+.tr-display .w { border-radius: 6px; padding: 2px 7px; }
+.divider { border: none; border-top: 2px dashed #e8e8ff; margin: 14px 0; }
+
+.success-badge { display: inline-flex; align-items: center; gap: 6px; background: linear-gradient(135deg,#22c55e,#16a34a); color: white; padding: 8px 20px; border-radius: 30px; font-weight: 800; font-size: 1rem; margin-bottom: 12px; animation: popIn 0.4s cubic-bezier(0.34,1.56,0.64,1); }
+@keyframes popIn { 0%{transform:scale(0);opacity:0} 100%{transform:scale(1);opacity:1} }
+
+.progress-wrap { background: #e8eaff; border-radius: 10px; height: 8px; margin-bottom: 16px; overflow: hidden; }
+.progress-fill { height: 100%; border-radius: 10px; background: linear-gradient(90deg,#667eea,#764ba2); transition: width 0.4s ease; }
+
+/* legend row */
+.legend-row { display: flex; flex-wrap: wrap; gap: 10px; margin: 10px 0 0; }
+.legend-item { display: flex; align-items: center; gap: 5px; font-size: 0.85rem; font-weight: 700; }
+.legend-dot { width: 12px; height: 12px; border-radius: 50%; flex-shrink: 0; }
+
+.welcome-screen { text-align: center; padding: 60px 20px; }
+.welcome-screen .big-emoji { font-size: 5rem; margin-bottom: 16px; }
+.welcome-screen h2 { font-family: 'Fredoka One', cursive; font-size: 2rem; color: #667eea; margin-bottom: 10px; }
+.welcome-screen p { color: #888; font-size: 1.05rem; max-width: 480px; margin: 0 auto; line-height: 1.6; }
+
+.confetti-piece { position: fixed; width: 10px; height: 14px; border-radius: 2px; animation: confettiFall 1.2s ease-out forwards; pointer-events: none; z-index: 9999; }
+@keyframes confettiFall { 0%{transform:translateY(0) rotate(0deg);opacity:1} 100%{transform:translateY(180px) rotate(720deg);opacity:0} }
+
+@media (max-width: 600px) {
+  .app-title { font-size: 1.6rem; }
+  .sentence-display { font-size: 1.15rem; }
+  .tr-display { font-size: 1rem; }
+  .word-card { font-size: 0.9rem; padding: 7px 14px; }
+}
+</style>
+</head>
+<body>
+
+<div class="app-header">
+  <div class="app-title">🎓 English Fun Lab</div>
+  <div class="app-subtitle">4. Sınıf İngilizce Cümle Kurma Oyunu</div>
+  <div class="score-bar">
+    <div class="score-badge">✅ Doğru: <span id="score-correct">0</span></div>
+    <div class="score-badge">⭐ Toplam: <span id="score-total">0</span></div>
+  </div>
+</div>
+
+<div class="tabs-container">
+  <div class="tabs-scroll" id="tabs-row"></div>
+</div>
+
+<div class="game-area" id="game-area">
+  <div class="welcome-screen">
+    <div class="big-emoji">👆</div>
+    <h2>Bir konu seç!</h2>
+    <p>Yukarıdaki sekmelerden bir konu başlığına tıkla ve cümle kurma oyununa başla.</p>
+  </div>
+</div>
+
+<script>
+// ─────────────────────────────────────────────────────────────────────
+// COLORS  — index i in EN sentence → C[i]
+// ─────────────────────────────────────────────────────────────────────
+const C = [
+  '#e74c3c','#2980b9','#27ae60','#8e44ad','#e67e22',
+  '#16a085','#c0392b','#1abc9c','#d35400','#2c3e50',
+  '#7f8c8d','#f39c12','#6c3483','#117a65','#922b21','#1a5276'
+];
+
+// ─────────────────────────────────────────────────────────────────────
+// DATA FORMAT
+//   en   : English words array          (defines color indices 0,1,2…)
+//   tr   : Turkish words in NATURAL order
+//   trMap: for each Turkish word → which EN index's color to use
+// ─────────────────────────────────────────────────────────────────────
+const TOPICS = {
+
+  adverbs: {
+    label: "Adverbs of Frequency", icon: "🔁", color: "#22c55e",
+    sentences: [
+      { en:["I","always","brush","my teeth","in the morning"],
+        tr:["Ben","sabahları","dişlerimi","her zaman","fırçalarım"],
+        trMap:[0,4,3,1,2] },
+      { en:["She","usually","eats","breakfast","at home"],
+        tr:["O","genellikle","evde","kahvaltı","yer"],
+        trMap:[0,1,4,3,2] },
+      { en:["We","often","play","games","after school"],
+        tr:["Biz","okuldan sonra","sık sık","oyun","oynarız"],
+        trMap:[0,4,1,3,2] },
+      { en:["He","sometimes","forgets","his homework"],
+        tr:["O","bazen","ödevini","unutur"],
+        trMap:[0,1,3,2] },
+      { en:["They","never","wake up","late","on weekdays"],
+        tr:["Onlar","hafta içi","asla","geç","kalkmaz"],
+        trMap:[0,4,1,3,2] },
+      { en:["My cat","always","sleeps","on the sofa"],
+        tr:["Kedim","her zaman","kanepede","uyur"],
+        trMap:[0,1,3,2] },
+      { en:["I","rarely","watch","TV","in the evening"],
+        tr:["Ben","akşamları","TV","nadiren","izlerim"],
+        trMap:[0,4,3,1,2] },
+      { en:["She","often","reads","books","before bed"],
+        tr:["O","yatmadan önce","sık sık","kitap","okur"],
+        trMap:[0,4,1,3,2] },
+      { en:["We","usually","go","to the park","on Sundays"],
+        tr:["Biz","Pazar günleri","parka","genellikle","gideriz"],
+        trMap:[0,4,3,1,2] },
+      { en:["He","always","helps","his mom","in the kitchen"],
+        tr:["O","her zaman","mutfakta","annesine","yardım eder"],
+        trMap:[0,1,4,3,2] },
+      { en:["I","sometimes","drink","orange juice"],
+        tr:["Ben","bazen","portakal suyu","içerim"],
+        trMap:[0,1,3,2] },
+      { en:["They","never","eat","junk food"],
+        tr:["Onlar","asla","abur cubur","yemezler"],
+        trMap:[0,1,3,2] },
+      { en:["My dog","always","barks","at strangers"],
+        tr:["Köpeğim","her zaman","yabancılara","havlar"],
+        trMap:[0,1,3,2] },
+      { en:["She","usually","wears","her school uniform"],
+        tr:["O","genellikle","okul üniformasını","giyer"],
+        trMap:[0,1,3,2] },
+      { en:["We","often","sing","songs","in class"],
+        tr:["Biz","sınıfta","sık sık","şarkı","söyleriz"],
+        trMap:[0,4,1,3,2] },
+      { en:["I","always","say","good morning","to my teacher"],
+        tr:["Ben","her zaman","öğretmenime","günaydın","derim"],
+        trMap:[0,1,4,3,2] },
+      { en:["He","rarely","cries","at school"],
+        tr:["O","okulda","nadiren","ağlar"],
+        trMap:[0,3,1,2] },
+      { en:["They","sometimes","play","football","in the garden"],
+        tr:["Onlar","bazen","bahçede","futbol","oynarlar"],
+        trMap:[0,1,4,3,2] },
+      { en:["My sister","often","draws","pictures"],
+        tr:["Kız kardeşim","sık sık","resim","çizer"],
+        trMap:[0,1,3,2] },
+      { en:["I","never","run","in the classroom"],
+        tr:["Ben","asla","sınıfta","koşmam"],
+        trMap:[0,1,3,2] },
+      { en:["She","always","smiles","at everyone"],
+        tr:["O","her zaman","herkese","güler"],
+        trMap:[0,1,3,2] },
+      { en:["We","sometimes","eat","ice cream","after dinner"],
+        tr:["Biz","bazen","akşam yemeğinden sonra","dondurma","yeriz"],
+        trMap:[0,1,4,3,2] },
+      { en:["He","usually","rides","his bike","to school"],
+        tr:["O","genellikle","okula","bisikletiyle","gider"],
+        trMap:[0,1,4,3,2] },
+      { en:["They","often","watch","cartoons","on TV"],
+        tr:["Onlar","sık sık","TV'de","çizgi film","izlerler"],
+        trMap:[0,1,4,3,2] },
+      { en:["I","usually","tidy","my room","on Saturday"],
+        tr:["Ben","Cumartesi günleri","odamı","genellikle","toplarım"],
+        trMap:[0,4,3,1,2] },
+      { en:["My mum","always","cooks","dinner","at home"],
+        tr:["Annem","her zaman","evde","akşam yemeği","pişirir"],
+        trMap:[0,1,4,3,2] },
+      { en:["He","sometimes","plays","the piano"],
+        tr:["O","bazen","piyanoyu","çalar"],
+        trMap:[0,1,3,2] },
+      { en:["She","never","forgets","her bag"],
+        tr:["O","asla","çantasını","unutmaz"],
+        trMap:[0,1,3,2] },
+      { en:["We","rarely","go","to bed","after midnight"],
+        tr:["Biz","gece yarısından sonra","nadiren","yatağa","gideriz"],
+        trMap:[0,4,1,3,2] },
+      { en:["I","often","help","my friend","with homework"],
+        tr:["Ben","sık sık","arkadaşıma","ödevinde","yardım ederim"],
+        trMap:[0,1,3,4,2] },
+      { en:["The dog","always","runs","in the park"],
+        tr:["Köpek","her zaman","parkta","koşar"],
+        trMap:[0,1,3,2] },
+      { en:["She","sometimes","buys","sweets","after school"],
+        tr:["O","bazen","okuldan sonra","şeker","alır"],
+        trMap:[0,1,4,3,2] },
+      { en:["We","usually","have","lunch","at noon"],
+        tr:["Biz","genellikle","öğlen","öğle yemeği","yeriz"],
+        trMap:[0,1,4,3,2] },
+      { en:["He","never","lies","to his parents"],
+        tr:["O","asla","anne babasına","yalan söylemez"],
+        trMap:[0,1,3,2] },
+      { en:["I","always","wash","my hands","before eating"],
+        tr:["Ben","her zaman","yemekten önce","ellerimi","yıkarım"],
+        trMap:[0,1,4,3,2] },
+      { en:["They","often","dance","at parties"],
+        tr:["Onlar","sık sık","partilerde","dans ederler"],
+        trMap:[0,1,3,2] },
+      { en:["My teacher","usually","gives","homework","on Fridays"],
+        tr:["Öğretmenim","genellikle","Cuma günleri","ödev","verir"],
+        trMap:[0,1,4,3,2] },
+      { en:["She","rarely","misses","school"],
+        tr:["O","nadiren","okulu","kaçırır"],
+        trMap:[0,1,3,2] },
+      { en:["I","sometimes","feel","tired","after school"],
+        tr:["Ben","bazen","okuldan sonra","yorgun","hissederim"],
+        trMap:[0,1,4,3,2] },
+      { en:["We","always","clap","for our friends"],
+        tr:["Biz","her zaman","arkadaşlarımız için","alkışlarız"],
+        trMap:[0,1,3,2] },
+      { en:["He","often","kicks","the ball","at recess"],
+        tr:["O","sık sık","teneffüste","topa","tekme atar"],
+        trMap:[0,1,4,3,2] },
+      { en:["They","usually","share","their food"],
+        tr:["Onlar","genellikle","yiyeceklerini","paylaşırlar"],
+        trMap:[0,1,3,2] },
+      { en:["I","never","cheat","in a test"],
+        tr:["Ben","asla","sınavda","kopya çekmem"],
+        trMap:[0,1,3,2] },
+      { en:["My brother","always","listens","to music"],
+        tr:["Erkek kardeşim","her zaman","müzik","dinler"],
+        trMap:[0,1,3,2] },
+      { en:["She","often","paints","pictures","in art class"],
+        tr:["O","sık sık","resim dersinde","resim","boyar"],
+        trMap:[0,1,4,3,2] },
+      { en:["We","sometimes","visit","our grandparents"],
+        tr:["Biz","bazen","büyükanne büyükbabamızı","ziyaret ederiz"],
+        trMap:[0,1,3,2] },
+      { en:["He","usually","sleeps","eight hours","a night"],
+        tr:["O","genellikle","geceye","sekiz saat","uyur"],
+        trMap:[0,1,4,3,2] },
+      { en:["I","rarely","eat","vegetables"],
+        tr:["Ben","nadiren","sebze","yerim"],
+        trMap:[0,1,3,2] },
+      { en:["They","always","stand up","when the teacher enters"],
+        tr:["Onlar","her zaman","öğretmen girince","ayağa kalkarlar"],
+        trMap:[0,1,3,2] },
+      { en:["My friends","often","laugh","together","at school"],
+        tr:["Arkadaşlarım","sık sık","okulda","birlikte","gülerler"],
+        trMap:[0,1,4,3,2] },
+    ]
+  },
+
+  time: {
+    label: "Time Expressions", icon: "⏰", color: "#3b82f6",
+    sentences: [
+      { en:["I","go","to school","every day"],
+        tr:["Ben","her gün","okula","giderim"],
+        trMap:[0,3,2,1] },
+      { en:["She","plays","the guitar","on Mondays"],
+        tr:["O","Pazartesi günleri","gitarı","çalar"],
+        trMap:[0,3,2,1] },
+      { en:["We","watch","a film","every weekend"],
+        tr:["Biz","her hafta sonu","bir film","izleriz"],
+        trMap:[0,3,2,1] },
+      { en:["He","visits","his grandma","every Sunday"],
+        tr:["O","her Pazar","büyükannesini","ziyaret eder"],
+        trMap:[0,3,2,1] },
+      { en:["They","will travel","to Ankara","next month"],
+        tr:["Onlar","gelecek ay","Ankara'ya","seyahat edecek"],
+        trMap:[0,3,2,1] },
+      { en:["I","wake up","early","every morning"],
+        tr:["Ben","her sabah","erken","uyanırım"],
+        trMap:[0,3,2,1] },
+      { en:["She","reads","a book","every night"],
+        tr:["O","her gece","bir kitap","okur"],
+        trMap:[0,3,2,1] },
+      { en:["We","will go","on a picnic","next Saturday"],
+        tr:["Biz","gelecek Cumartesi","pikniğe","gideceğiz"],
+        trMap:[0,3,2,1] },
+      { en:["He","cleans","his room","once a week"],
+        tr:["O","haftada bir","odasını","temizler"],
+        trMap:[0,3,2,1] },
+      { en:["They","play","football","every weekend"],
+        tr:["Onlar","her hafta sonu","futbol","oynarlar"],
+        trMap:[0,3,2,1] },
+      { en:["I","always","eat","dinner","at seven o'clock"],
+        tr:["Ben","her zaman","yedide","akşam yemeği","yerim"],
+        trMap:[0,1,4,3,2] },
+      { en:["She","will start","school","in September"],
+        tr:["O","Eylül'de","okula","başlayacak"],
+        trMap:[0,3,2,1] },
+      { en:["We","have","a party","every year"],
+        tr:["Biz","her yıl","parti","yaparız"],
+        trMap:[0,3,2,1] },
+      { en:["He","swims","in the sea","every summer"],
+        tr:["O","her yaz","denizde","yüzer"],
+        trMap:[0,3,2,1] },
+      { en:["They","wake up","at six","in the morning"],
+        tr:["Onlar","sabah","altıda","uyanırlar"],
+        trMap:[0,3,2,1] },
+      { en:["I","sometimes","see","a rainbow","in spring"],
+        tr:["Ben","bazen","ilkbaharda","gökkuşağı","görürüm"],
+        trMap:[0,1,4,3,2] },
+      { en:["She","will come","to my house","tomorrow afternoon"],
+        tr:["O","yarın öğleden sonra","evime","gelecek"],
+        trMap:[0,3,2,1] },
+      { en:["We","go","to the market","on Saturdays"],
+        tr:["Biz","Cumartesi günleri","pazara","gideriz"],
+        trMap:[0,3,2,1] },
+      { en:["He","finishes","his project","on time"],
+        tr:["O","her zaman","projesini","zamanında bitirir"],
+        trMap:[0,2,1,3] },
+      { en:["I","will visit","the zoo","this weekend"],
+        tr:["Ben","bu hafta sonu","hayvanat bahçesini","ziyaret edeceğim"],
+        trMap:[0,3,2,1] },
+      { en:["They","brush","their teeth","twice a day"],
+        tr:["Onlar","günde iki kez","dişlerini","fırçalarlar"],
+        trMap:[0,3,2,1] },
+      { en:["She","studies","at the library","every day"],
+        tr:["O","her gün","kütüphanede","çalışır"],
+        trMap:[0,3,2,1] },
+      { en:["We","will go","camping","next summer"],
+        tr:["Biz","gelecek yaz","kamp yapmaya","gideceğiz"],
+        trMap:[0,3,2,1] },
+      { en:["He","rides","his bike","every afternoon"],
+        tr:["O","her öğleden sonra","bisikletini","sürer"],
+        trMap:[0,3,2,1] },
+      { en:["I","study","English","every day"],
+        tr:["Ben","her gün","İngilizce","çalışırım"],
+        trMap:[0,3,2,1] },
+      { en:["She","eats","lunch","at twelve o'clock"],
+        tr:["O","on ikide","öğle yemeği","yer"],
+        trMap:[0,3,2,1] },
+      { en:["They","will buy","a new pet","next week"],
+        tr:["Onlar","gelecek hafta","yeni bir evcil hayvan","satın alacak"],
+        trMap:[0,3,2,1] },
+      { en:["We","have","a snowball fight","every winter"],
+        tr:["Biz","her kış","kartopu savaşı","yaparız"],
+        trMap:[0,3,2,1] },
+      { en:["He","does","his homework","every evening"],
+        tr:["O","her akşam","ödevini","yapar"],
+        trMap:[0,3,2,1] },
+      { en:["I","will eat","cake","on my birthday"],
+        tr:["Ben","doğum günümde","pasta","yiyeceğim"],
+        trMap:[0,3,2,1] },
+      { en:["She","plays","the violin","every day"],
+        tr:["O","her gün","kemanı","çalar"],
+        trMap:[0,3,2,1] },
+      { en:["We","celebrate","New Year","every January"],
+        tr:["Biz","her Ocak'ta","yeni yılı","kutlarız"],
+        trMap:[0,3,2,1] },
+      { en:["He","will join","the team","next year"],
+        tr:["O","gelecek yıl","takıma","katılacak"],
+        trMap:[0,3,2,1] },
+      { en:["I","visit","my cousins","every spring"],
+        tr:["Ben","her ilkbaharda","kuzenlerimi","ziyaret ederim"],
+        trMap:[0,3,2,1] },
+      { en:["They","go","to church","every Sunday"],
+        tr:["Onlar","her Pazar","kiliseye","giderler"],
+        trMap:[0,3,2,1] },
+      { en:["She","will finish","the race","in ten minutes"],
+        tr:["O","on dakika içinde","yarışı","bitirecek"],
+        trMap:[0,3,2,1] },
+      { en:["We","meet","our friends","once a month"],
+        tr:["Biz","ayda bir","arkadaşlarımızla","buluşuruz"],
+        trMap:[0,3,2,1] },
+      { en:["He","is","playing","in the garden","now"],
+        tr:["O","şu an","bahçede","oynuyor"],
+        trMap:[0,3,2,1] },
+      { en:["I","will move","to a new house","next spring"],
+        tr:["Ben","gelecek ilkbaharda","yeni bir eve","taşınacağım"],
+        trMap:[0,3,2,1] },
+      { en:["They","are","dancing","at the party","now"],
+        tr:["Onlar","şu an","partide","dans ediyorlar"],
+        trMap:[0,4,3,2,1] },
+      { en:["She","wakes up","at seven","every morning"],
+        tr:["O","her sabah","yedide","uyanır"],
+        trMap:[0,3,2,1] },
+      { en:["We","go","to the beach","every summer"],
+        tr:["Biz","her yaz","sahile","gideriz"],
+        trMap:[0,3,2,1] },
+      { en:["He","takes","a shower","every morning"],
+        tr:["O","her sabah","duş","alır"],
+        trMap:[0,3,2,1] },
+      { en:["I","will learn","swimming","this summer"],
+        tr:["Ben","bu yaz","yüzmeyi","öğreneceğim"],
+        trMap:[0,3,2,1] },
+      { en:["They","have","a picnic","every Sunday"],
+        tr:["Onlar","her Pazar","piknik","yaparlar"],
+        trMap:[0,3,2,1] },
+      { en:["She","visits","the library","every Friday"],
+        tr:["O","her Cuma","kütüphaneyi","ziyaret eder"],
+        trMap:[0,3,2,1] },
+      { en:["We","will plant","flowers","in the spring"],
+        tr:["Biz","ilkbaharda","çiçekler","dikeceğiz"],
+        trMap:[0,3,2,1] },
+      { en:["He","is","studying","maths","now"],
+        tr:["O","şu an","matematik","çalışıyor"],
+        trMap:[0,3,2,1] },
+      { en:["I","call","my grandma","on her birthday"],
+        tr:["Ben","doğum gününde","büyükanemi","ararım"],
+        trMap:[0,3,2,1] },
+      { en:["They","will meet","at the park","at four o'clock"],
+        tr:["Onlar","dörtte","parkta","buluşacaklar"],
+        trMap:[0,3,2,1] },
+    ]
+  },
+
+  tenses: {
+    label: "Tenses", icon: "📚", color: "#8b5cf6",
+    sentences: [
+      { en:["She","is","reading","a book","now"],
+        tr:["O","şu an","bir kitap","okuyor"],
+        trMap:[0,4,3,2] },
+      { en:["Ahmet","is playing","the guitar","now"],
+        tr:["Ahmet","şuan","gitar","çalıyor"],
+        trMap:[0,3,2,1] },
+      { en:["I","am","eating","a sandwich","now"],
+        tr:["Ben","şu an","sandviç","yiyorum"],
+        trMap:[0,4,3,2] },
+      { en:["They","will go","to the cinema","tomorrow"],
+        tr:["Onlar","yarın","sinemaya","gidecekler"],
+        trMap:[0,3,2,1] },
+      { en:["We","are","playing","in the garden","now"],
+        tr:["Biz","şu an","bahçede","oynuyoruz"],
+        trMap:[0,4,3,2] },
+      { en:["He","walks","to school","every day"],
+        tr:["O","her gün","okula","yürür"],
+        trMap:[0,3,2,1] },
+      { en:["She","will eat","pasta","tonight"],
+        tr:["O","bu gece","makarna","yiyecek"],
+        trMap:[0,3,2,1] },
+      { en:["I","am","writing","a letter","now"],
+        tr:["Ben","şu an","mektup","yazıyorum"],
+        trMap:[0,4,3,2] },
+      { en:["They","are","playing","basketball","now"],
+        tr:["Onlar","şu an","basketbol","oynuyorlar"],
+        trMap:[0,4,3,2] },
+      { en:["He","is","watching","TV","now"],
+        tr:["O","şu an","TV","izliyor"],
+        trMap:[0,3,2,1] },
+      { en:["We","visit","the museum","every month"],
+        tr:["Biz","her ay","müzeyi","ziyaret ederiz"],
+        trMap:[0,3,2,1] },
+      { en:["She","dances","every Saturday"],
+        tr:["O","her Cumartesi","dans eder"],
+        trMap:[0,2,1] },
+      { en:["I","will call","you","tomorrow"],
+        tr:["Ben","yarın","seni","arayacağım"],
+        trMap:[0,3,2,1] },
+      { en:["They","are","cooking","lunch","now"],
+        tr:["Onlar","şu an","öğle yemeği","pişiriyorlar"],
+        trMap:[0,4,3,2] },
+      { en:["He","drinks","milk","every morning"],
+        tr:["O","her sabah","süt","içer"],
+        trMap:[0,3,2,1] },
+      { en:["She","goes","to the market","on Saturdays"],
+        tr:["O","Cumartesi günleri","markete","gider"],
+        trMap:[0,3,2,1] },
+      { en:["We","will have","a test","next week"],
+        tr:["Biz","gelecek hafta","sınav","olacak"],
+        trMap:[0,3,2,1] },
+      { en:["I","am","drawing","a picture","now"],
+        tr:["Ben","şu an","bir resim","çiziyorum"],
+        trMap:[0,4,3,2] },
+      { en:["They","are","cleaning","the classroom","now"],
+        tr:["Onlar","şu an","sınıfı","temizliyorlar"],
+        trMap:[0,4,3,2] },
+      { en:["He","will travel","to İstanbul","next summer"],
+        tr:["O","gelecek yaz","İstanbul'a","seyahat edecek"],
+        trMap:[0,3,2,1] },
+      { en:["She","is","singing","a song","now"],
+        tr:["O","şu an","bir şarkı","söylüyor"],
+        trMap:[0,4,3,2] },
+      { en:["We","eat","vegetables","every day"],
+        tr:["Biz","her gün","sebze","yeriz"],
+        trMap:[0,3,2,1] },
+      { en:["I","always","win","a prize","at school"],
+        tr:["Ben","okulda","her zaman","ödül","kazanırım"],
+        trMap:[0,4,1,3,2] },
+      { en:["They","will build","a new school","next year"],
+        tr:["Onlar","gelecek yıl","yeni bir okul","inşa edecekler"],
+        trMap:[0,3,2,1] },
+      { en:["He","is","running","in the park","now"],
+        tr:["O","şu an","parkta","koşuyor"],
+        trMap:[0,4,3,2] },
+      { en:["She","is","cooking","a soup","now"],
+        tr:["O","şu an","çorba","pişiriyor"],
+        trMap:[0,4,3,2] },
+      { en:["I","study","English","every day"],
+        tr:["Ben","her gün","İngilizce","çalışırım"],
+        trMap:[0,3,2,1] },
+      { en:["We","are","doing","our homework","now"],
+        tr:["Biz","şu an","ödevimizi","yapıyoruz"],
+        trMap:[0,4,3,2] },
+      { en:["They","are","buying","new shoes","now"],
+        tr:["Onlar","şu an","yeni ayakkabı","alıyorlar"],
+        trMap:[0,4,3,2] },
+      { en:["He","will join","the football team","next year"],
+        tr:["O","gelecek yıl","futbol takımına","katılacak"],
+        trMap:[0,3,2,1] },
+      { en:["She","is","eating","an apple","now"],
+        tr:["O","şu an","bir elma","yiyor"],
+        trMap:[0,4,3,2] },
+      { en:["I","am","drawing","a horse","now"],
+        tr:["Ben","şu an","at","çiziyorum"],
+        trMap:[0,4,3,2] },
+      { en:["We","will go","to the fair","on Saturday"],
+        tr:["Biz","Cumartesi günü","panayıra","gideceğiz"],
+        trMap:[0,3,2,1] },
+      { en:["They","are","swimming","in the pool","now"],
+        tr:["Onlar","şu an","havuzda","yüzüyorlar"],
+        trMap:[0,4,3,2] },
+      { en:["He","is","making","a cake","now"],
+        tr:["O","şu an","pasta","yapıyor"],
+        trMap:[0,4,3,2] },
+      { en:["She","walks","her dog","every morning"],
+        tr:["O","her sabah","köpeğini","yürütür"],
+        trMap:[0,3,2,1] },
+      { en:["I","will wear","my new dress","tomorrow"],
+        tr:["Ben","yarın","yeni elbisemi","giyeceğim"],
+        trMap:[0,3,2,1] },
+      { en:["We","play","chess","every Friday"],
+        tr:["Biz","her Cuma","satranç","oynarız"],
+        trMap:[0,3,2,1] },
+      { en:["They","are","drawing","pictures","now"],
+        tr:["Onlar","şu an","resim","çiziyorlar"],
+        trMap:[0,4,3,2] },
+      { en:["He","reads","the newspaper","every Sunday"],
+        tr:["O","her Pazar","gazete","okur"],
+        trMap:[0,3,2,1] },
+      { en:["She","is","looking","for her pencil","now"],
+        tr:["O","şu an","kalemini","arıyor"],
+        trMap:[0,4,3,2] },
+      { en:["I","will help","my mum","this evening"],
+        tr:["Ben","bu akşam","anneme","yardım edeceğim"],
+        trMap:[0,3,2,1] },
+      { en:["We","are","cleaning","the house","now"],
+        tr:["Biz","şu an","evi","temizliyoruz"],
+        trMap:[0,4,3,2] },
+      { en:["They","have","a puppy","at home"],
+        tr:["Onlar","evde","bir yavru köpekleri","var"],
+        trMap:[0,3,2,1] },
+      { en:["He","will come","to my party","next Friday"],
+        tr:["O","gelecek Cuma","partiye","gelecek"],
+        trMap:[0,3,2,1] },
+      { en:["She","is","baking","cookies","now"],
+        tr:["O","şu an","kurabiye","pişiriyor"],
+        trMap:[0,4,3,2] },
+      { en:["I","sometimes","find","coins","on the street"],
+        tr:["Ben","bazen","sokakta","madeni para","bulurum"],
+        trMap:[0,1,4,3,2] },
+      { en:["We","love","playing","in the snow"],
+        tr:["Biz","karda","oynamayı","severiz"],
+        trMap:[0,3,2,1] },
+      { en:["They","will plant","trees","next spring"],
+        tr:["Onlar","gelecek ilkbaharda","ağaçlar","dikecekler"],
+        trMap:[0,3,2,1] },
+      { en:["He","is","sleeping","in his room","now"],
+        tr:["O","şu an","odasında","uyuyor"],
+        trMap:[0,4,3,2] },
+    ]
+  },
+
+  can: {
+    label: "Can / Can't", icon: "💪", color: "#f59e0b",
+    sentences: [
+      { en:["I","can","swim","very fast"],
+        tr:["Ben","çok hızlı","yüzebilirim"],
+        trMap:[0,3,2] },
+      { en:["She","can't","ride","a bike"],
+        tr:["O","bisiklet","süremez"],
+        trMap:[0,3,1] },
+      { en:["He","can","play","the piano"],
+        tr:["O","piyano","çalabilir"],
+        trMap:[0,3,1] },
+      { en:["We","can't","fly","like birds"],
+        tr:["Biz","kuşlar gibi","uçamayız"],
+        trMap:[0,3,1] },
+      { en:["They","can","speak","English"],
+        tr:["Onlar","İngilizce","konuşabilirler"],
+        trMap:[0,3,1] },
+      { en:["I","can't","eat","spicy food"],
+        tr:["Ben","acılı yemek","yiyemem"],
+        trMap:[0,3,1] },
+      { en:["She","can","draw","beautiful pictures"],
+        tr:["O","güzel resimler","çizebilir"],
+        trMap:[0,3,1] },
+      { en:["He","can't","run","very fast"],
+        tr:["O","çok hızlı","koşamaz"],
+        trMap:[0,3,1] },
+      { en:["We","can","solve","maths problems"],
+        tr:["Biz","matematik problemleri","çözebiliriz"],
+        trMap:[0,3,1] },
+      { en:["They","can't","come","to the party"],
+        tr:["Onlar","partiye","gelemezler"],
+        trMap:[0,3,1] },
+      { en:["I","can","read","English books"],
+        tr:["Ben","İngilizce kitaplar","okuyabilirim"],
+        trMap:[0,3,1] },
+      { en:["She","can't","stay","up late"],
+        tr:["O","geç saate kadar","kalamaz"],
+        trMap:[0,3,1] },
+      { en:["He","can","make","a sandwich"],
+        tr:["O","sandviç","yapabilir"],
+        trMap:[0,3,1] },
+      { en:["We","can","climb","trees"],
+        tr:["Biz","ağaçlara","çıkabiliriz"],
+        trMap:[0,3,1] },
+      { en:["They","can","dance","together"],
+        tr:["Onlar","birlikte","dans edebilirler"],
+        trMap:[0,3,1] },
+      { en:["I","can't","find","my pencil"],
+        tr:["Ben","kalemimi","bulamam"],
+        trMap:[0,3,1] },
+      { en:["She","can","bake","chocolate cake"],
+        tr:["O","çikolatalı pasta","pişirebilir"],
+        trMap:[0,3,1] },
+      { en:["He","can't","sleep","in the dark"],
+        tr:["O","karanlıkta","uyuyamaz"],
+        trMap:[0,3,1] },
+      { en:["We","can't","talk","in the library"],
+        tr:["Biz","kütüphanede","konuşamayız"],
+        trMap:[0,3,1] },
+      { en:["They","can","write","their names"],
+        tr:["Onlar","isimlerini","yazabilirler"],
+        trMap:[0,3,1] },
+      { en:["I","can","jump","very high"],
+        tr:["Ben","çok yükseğe","atlayabilirim"],
+        trMap:[0,3,1] },
+      { en:["She","can't","lift","heavy boxes"],
+        tr:["O","ağır kutuları","kaldıramaz"],
+        trMap:[0,3,1] },
+      { en:["He","can","count","to one hundred"],
+        tr:["O","yüze kadar","sayabilir"],
+        trMap:[0,3,1] },
+      { en:["We","can","see","the mountains","from here"],
+        tr:["Biz","buradan","dağları","görebiliriz"],
+        trMap:[0,4,3,1] },
+      { en:["They","can't","use","phones","at school"],
+        tr:["Onlar","okulda","telefon","kullanamazlar"],
+        trMap:[0,4,3,1] },
+      { en:["I","can't","speak","Spanish"],
+        tr:["Ben","İspanyolca","konuşamam"],
+        trMap:[0,3,1] },
+      { en:["She","can","sing","very well"],
+        tr:["O","çok iyi","şarkı söyleyebilir"],
+        trMap:[0,3,1] },
+      { en:["He","can't","finish","the test","in time"],
+        tr:["O","sınavı","zamanında","bitiremez"],
+        trMap:[0,3,4,1] },
+      { en:["We","can","help","each other"],
+        tr:["Biz","birbirimize","yardım edebiliriz"],
+        trMap:[0,3,1] },
+      { en:["They","can","kick","the ball","far"],
+        tr:["Onlar","topa","uzağa","tekme atabilirler"],
+        trMap:[0,3,4,1] },
+      { en:["I","can","tie","my shoelaces"],
+        tr:["Ben","ayakkabı bağlarımı","bağlayabilirim"],
+        trMap:[0,3,1] },
+      { en:["She","can't","stop","laughing"],
+        tr:["O","gülmeyi","durduramaz"],
+        trMap:[0,3,1] },
+      { en:["He","can","ride","a horse"],
+        tr:["O","at","sürebilir"],
+        trMap:[0,3,1] },
+      { en:["We","can't","play","in the rain"],
+        tr:["Biz","yağmurda","oynayamayız"],
+        trMap:[0,3,1] },
+      { en:["They","can","catch","a ball"],
+        tr:["Onlar","top","yakalayabilirler"],
+        trMap:[0,3,1] },
+      { en:["I","can","whistle","a tune"],
+        tr:["Ben","bir melodi","ıslık çalabilirim"],
+        trMap:[0,3,1] },
+      { en:["She","can't","reach","the top shelf"],
+        tr:["O","en üst rafa","ulaşamaz"],
+        trMap:[0,3,1] },
+      { en:["He","can","hold","his breath","underwater"],
+        tr:["O","su altında","nefesini","tutabilir"],
+        trMap:[0,4,3,1] },
+      { en:["We","can","finish","this game"],
+        tr:["Biz","bu oyunu","bitirebiliriz"],
+        trMap:[0,3,1] },
+      { en:["They","can't","hear","the teacher"],
+        tr:["Onlar","öğretmeni","duyamazlar"],
+        trMap:[0,3,1] },
+      { en:["I","can't","wait","for summer"],
+        tr:["Ben","yazı","bekleyemem"],
+        trMap:[0,3,1] },
+      { en:["She","can","type","very fast"],
+        tr:["O","çok hızlı","yazabilir"],
+        trMap:[0,3,1] },
+      { en:["He","can't","eat","mushrooms"],
+        tr:["O","mantar","yiyemez"],
+        trMap:[0,3,1] },
+      { en:["We","can","paint","a rainbow"],
+        tr:["Biz","bir gökkuşağı","boyayabiliriz"],
+        trMap:[0,3,1] },
+      { en:["They","can","clap","in rhythm"],
+        tr:["Onlar","ritimde","alkış tutabilirler"],
+        trMap:[0,3,1] },
+      { en:["I","can","tell","funny jokes"],
+        tr:["Ben","komik fıkralar","anlatabiliririm"],
+        trMap:[0,3,1] },
+      { en:["She","can't","skip","breakfast"],
+        tr:["O","kahvaltıyı","atlayamaz"],
+        trMap:[0,3,1] },
+      { en:["He","can","build","a sandcastle"],
+        tr:["O","kum kalesi","inşa edebilir"],
+        trMap:[0,3,1] },
+      { en:["We","can't","go","out","without permission"],
+        tr:["Biz","izinsiz","dışarı","çıkamayız"],
+        trMap:[0,4,3,1] },
+      { en:["They","can","read","the clock"],
+        tr:["Onlar","saati","okuyabilirler"],
+        trMap:[0,3,1] },
+    ]
+  },
+
+  tobe: {
+    label: "Am / Is / Are", icon: "🟣", color: "#ec4899",
+    sentences: [
+      { en:["I","am","a student"],
+        tr:["Ben","bir öğrenci","yım"],
+        trMap:[0,2,1] },
+      { en:["She","is","my best friend"],
+        tr:["O","en iyi arkadaşım","dır"],
+        trMap:[0,2,1] },
+      { en:["They","are","very happy","today"],
+        tr:["Onlar","bugün","çok mutlu","durlar"],
+        trMap:[0,3,2,1] },
+      { en:["We","are","in the same class"],
+        tr:["Biz","aynı sınıfta","yız"],
+        trMap:[0,2,1] },
+      { en:["He","is","tall","and strong"],
+        tr:["O","uzun","ve güçlü","dür"],
+        trMap:[0,2,3,1] },
+      { en:["The cat","is","black","and white"],
+        tr:["Kedi","siyah","ve beyaz","dır"],
+        trMap:[0,2,3,1] },
+      { en:["I","am","eight years old"],
+        tr:["Ben","sekiz yaşında","yım"],
+        trMap:[0,2,1] },
+      { en:["You","are","very clever"],
+        tr:["Sen","çok zeki","sin"],
+        trMap:[0,2,1] },
+      { en:["The books","are","on the desk"],
+        tr:["Kitaplar","masanın üstünde","dir"],
+        trMap:[0,2,1] },
+      { en:["She","is","a kind teacher"],
+        tr:["O","nazik bir öğretmen","dir"],
+        trMap:[0,2,1] },
+      { en:["We","are","best friends"],
+        tr:["Biz","en iyi arkadaşlar","ız"],
+        trMap:[0,2,1] },
+      { en:["He","is","very funny"],
+        tr:["O","çok komik","tir"],
+        trMap:[0,2,1] },
+      { en:["I","am","from Turkey"],
+        tr:["Ben","Türkiye'den","im"],
+        trMap:[0,2,1] },
+      { en:["The apples","are","red","and juicy"],
+        tr:["Elmalar","kırmızı","ve sulu","dur"],
+        trMap:[0,2,3,1] },
+      { en:["She","is","good at drawing"],
+        tr:["O","çizmekte iyi","dir"],
+        trMap:[0,2,1] },
+      { en:["You","are","my favourite friend"],
+        tr:["Sen","en sevdiğim arkadaşım","sın"],
+        trMap:[0,2,1] },
+      { en:["They","are","tired","after school"],
+        tr:["Onlar","okuldan sonra","yorgun","durlar"],
+        trMap:[0,3,2,1] },
+      { en:["The weather","is","sunny","today"],
+        tr:["Hava","bugün","güneşli","dir"],
+        trMap:[0,3,2,1] },
+      { en:["I","am","happy","at school"],
+        tr:["Ben","okulda","mutlu","yum"],
+        trMap:[0,3,2,1] },
+      { en:["We","are","ready","for the test"],
+        tr:["Biz","sınav için","hazır","ız"],
+        trMap:[0,3,2,1] },
+      { en:["He","is","absent","from school","today"],
+        tr:["O","bugün","okulda","yok","tur"],
+        trMap:[0,4,3,2,1] },
+      { en:["The children","are","very noisy"],
+        tr:["Çocuklar","çok gürültülü","dür"],
+        trMap:[0,2,1] },
+      { en:["She","is","the class leader"],
+        tr:["O","sınıf başkanı","dır"],
+        trMap:[0,2,1] },
+      { en:["I","am","hungry","and thirsty"],
+        tr:["Ben","aç","ve susuz","um"],
+        trMap:[0,2,3,1] },
+      { en:["They","are","brothers","and sisters"],
+        tr:["Onlar","kardeş","dirler"],
+        trMap:[0,2,1] },
+      { en:["The school","is","very big"],
+        tr:["Okul","çok büyük","tür"],
+        trMap:[0,2,1] },
+      { en:["We","are","excited","about the trip"],
+        tr:["Biz","gezi için","heyecanlı","yız"],
+        trMap:[0,3,2,1] },
+      { en:["He","is","a good football player"],
+        tr:["O","iyi bir futbolcu","dur"],
+        trMap:[0,2,1] },
+      { en:["You","are","always","on time"],
+        tr:["Sen","her zaman","vaktinde","sin"],
+        trMap:[0,2,3,1] },
+      { en:["The dogs","are","in the garden"],
+        tr:["Köpekler","bahçede","dir"],
+        trMap:[0,2,1] },
+      { en:["She","is","short","but strong"],
+        tr:["O","kısa","ama güçlü","dür"],
+        trMap:[0,2,3,1] },
+      { en:["I","am","not afraid","of spiders"],
+        tr:["Ben","örümceklerden","korkmuyor","um"],
+        trMap:[0,3,2,1] },
+      { en:["They","are","on the third floor"],
+        tr:["Onlar","üçüncü katta","dırlar"],
+        trMap:[0,2,1] },
+      { en:["We","are","good","at maths"],
+        tr:["Biz","matematikte","iyi","yiz"],
+        trMap:[0,3,2,1] },
+      { en:["The pizza","is","hot","and delicious"],
+        tr:["Pizza","sıcak","ve lezzetli","dir"],
+        trMap:[0,2,3,1] },
+      { en:["He","is","in bed","with a cold"],
+        tr:["O","soğuk algınlığıyla","yatakta","dır"],
+        trMap:[0,3,2,1] },
+      { en:["I","am","the youngest","in the family"],
+        tr:["Ben","ailede","en küçük","üm"],
+        trMap:[0,3,2,1] },
+      { en:["She","is","late","for school"],
+        tr:["O","okula","geç","tir"],
+        trMap:[0,3,2,1] },
+      { en:["They","are","from","different countries"],
+        tr:["Onlar","farklı ülkelerden","dirler"],
+        trMap:[0,3,1] },
+      { en:["The windows","are","open"],
+        tr:["Pencereler","açık","tır"],
+        trMap:[0,2,1] },
+      { en:["We","are","a team"],
+        tr:["Biz","bir takım","ız"],
+        trMap:[0,2,1] },
+      { en:["You","are","so kind","to everyone"],
+        tr:["Sen","herkese","çok nazik","sin"],
+        trMap:[0,3,2,1] },
+      { en:["He","is","proud","of his drawing"],
+        tr:["O","çizimiyle","gurur duyuyor","dur"],
+        trMap:[0,3,2,1] },
+      { en:["The homework","is","very difficult"],
+        tr:["Ödev","çok zor","dur"],
+        trMap:[0,2,1] },
+      { en:["I","am","interested in","science"],
+        tr:["Ben","fen bilimine","ilgili","yim"],
+        trMap:[0,3,2,1] },
+      { en:["She","is","nice","to everyone"],
+        tr:["O","herkese","nazik","tir"],
+        trMap:[0,3,2,1] },
+      { en:["They","are","playing","in the rain"],
+        tr:["Onlar","yağmurda","oynuyor","lar"],
+        trMap:[0,3,2,1] },
+      { en:["The park","is","near our school"],
+        tr:["Park","okulumuzun yakınında","dır"],
+        trMap:[0,2,1] },
+      { en:["We","are","learning","new words","today"],
+        tr:["Biz","bugün","yeni kelimeler","öğreniyor","uz"],
+        trMap:[0,4,3,2,1] },
+      { en:["He","is","my desk partner"],
+        tr:["O","benim sıra arkadaşım","dır"],
+        trMap:[0,2,1] },
+    ]
+  },
+
+  vocab: {
+    label: "Vocabulary", icon: "📝", color: "#14b8a6",
+    sentences: [
+      { en:["An","elephant","is","the biggest","land animal"],
+        tr:["Bir","fil","en büyük","kara hayvanıdır"],
+        trMap:[0,1,3,4] },
+      { en:["A","butterfly","has","colourful wings"],
+        tr:["Bir","kelebeğin","renkli kanatları","vardır"],
+        trMap:[0,1,3,2] },
+      { en:["I","love","eating","watermelon","in summer"],
+        tr:["Ben","yazın","karpuz","yemeyi","severim"],
+        trMap:[0,4,3,2,1] },
+      { en:["The","baker","bakes","fresh bread","every morning"],
+        tr:["Fırıncı","her sabah","taze ekmek","pişirir"],
+        trMap:[1,4,3,2] },
+      { en:["A","library","has","many books"],
+        tr:["Bir","kütüphanede","çok","kitap vardır"],
+        trMap:[0,1,2,3] },
+      { en:["The","doctor","helps","sick people"],
+        tr:["Doktor","hasta insanlara","yardım eder"],
+        trMap:[1,3,2] },
+      { en:["My","favourite colour","is","blue"],
+        tr:["Benim","en sevdiğim renk","mavidir"],
+        trMap:[0,1,3] },
+      { en:["A","caterpillar","turns into","a butterfly"],
+        tr:["Bir","tırtıl","kelebeğe","dönüşür"],
+        trMap:[0,1,3,2] },
+      { en:["We","use","a ruler","to measure length"],
+        tr:["Biz","uzunluğu ölçmek için","cetvel","kullanırız"],
+        trMap:[0,3,2,1] },
+      { en:["The","supermarket","sells","fresh vegetables"],
+        tr:["Süpermarket","taze sebze","satar"],
+        trMap:[1,3,2] },
+      { en:["A","telescope","helps us","see","faraway stars"],
+        tr:["Bir","teleskop","uzak yıldızları","görmemize","yardımcı olur"],
+        trMap:[0,1,4,3,2] },
+      { en:["The","firefighter","puts out","fires"],
+        tr:["İtfaiyeci","yangınları","söndürür"],
+        trMap:[1,3,2] },
+      { en:["A","compass","shows","which way","is north"],
+        tr:["Bir","pusula","kuzey yönünü","gösterir"],
+        trMap:[0,1,3,2] },
+      { en:["The","dentist","checks","our teeth"],
+        tr:["Diş hekimi","dişlerimizi","kontrol eder"],
+        trMap:[1,3,2] },
+      { en:["I","keep","my books","in a backpack"],
+        tr:["Ben","kitaplarımı","çantamda","taşırım"],
+        trMap:[0,3,2,1] },
+      { en:["A","rainbow","has","seven colours"],
+        tr:["Bir","gökkuşağının","yedi rengi","vardır"],
+        trMap:[0,1,3,2] },
+      { en:["The","pilot","flies","aeroplanes"],
+        tr:["Pilot","uçakları","uçurur"],
+        trMap:[1,3,2] },
+      { en:["My","favourite season","is","winter"],
+        tr:["Benim","en sevdiğim mevsim","kıştır"],
+        trMap:[0,1,3] },
+      { en:["A","calendar","shows","the days","and months"],
+        tr:["Bir","takvim","günleri","ve ayları","gösterir"],
+        trMap:[0,1,3,4,2] },
+      { en:["The","farmer","grows","fruit","and vegetables"],
+        tr:["Çiftçi","meyve","ve sebze","yetiştirir"],
+        trMap:[1,3,4,2] },
+      { en:["A","thermometer","measures","temperature"],
+        tr:["Bir","termometre","sıcaklığı","ölçer"],
+        trMap:[0,1,3,2] },
+      { en:["The","postman","delivers","letters","every day"],
+        tr:["Postacı","her gün","mektupları","teslim eder"],
+        trMap:[1,4,3,2] },
+      { en:["I","use","scissors","to cut paper"],
+        tr:["Ben","kağıt kesmek için","makas","kullanırım"],
+        trMap:[0,3,2,1] },
+      { en:["A","penguin","lives","in cold places"],
+        tr:["Bir","penguen","soğuk yerlerde","yaşar"],
+        trMap:[0,1,3,2] },
+      { en:["The","scientist","does","experiments"],
+        tr:["Bilim insanı","deneyler","yapar"],
+        trMap:[1,3,2] },
+      { en:["An","island","is","surrounded by","water"],
+        tr:["Bir","ada","suyla","çevrilmiştir"],
+        trMap:[0,1,4,3] },
+      { en:["My","pencil case","has","many colours"],
+        tr:["Kalem kutumda","çok","renk","var"],
+        trMap:[1,2,3,0] },
+      { en:["A","volcano","erupts","with hot lava"],
+        tr:["Bir","yanardağ","sıcak lavla","patlar"],
+        trMap:[0,1,3,2] },
+      { en:["The","mechanic","fixes","broken cars"],
+        tr:["Tamirci","bozuk arabaları","tamir eder"],
+        trMap:[1,3,2] },
+      { en:["I","need","a dictionary","to find words"],
+        tr:["Ben","kelimeleri bulmak için","sözlüğe","ihtiyacım var"],
+        trMap:[0,3,2,1] },
+      { en:["A","helicopter","can","hover","in the air"],
+        tr:["Bir","helikopter","havada","asılı kalabilir"],
+        trMap:[0,1,4,3] },
+      { en:["The","architect","designs","buildings"],
+        tr:["Mimar","binaları","tasarlar"],
+        trMap:[1,3,2] },
+      { en:["A","submarine","travels","under the sea"],
+        tr:["Bir","denizaltı","denizin altında","ilerler"],
+        trMap:[0,1,3,2] },
+      { en:["My","favourite food","is","pasta"],
+        tr:["Benim","en sevdiğim yemek","makarnadır"],
+        trMap:[0,1,3] },
+      { en:["The","photographer","takes","beautiful photos"],
+        tr:["Fotoğrafçı","güzel fotoğraflar","çeker"],
+        trMap:[1,3,2] },
+      { en:["A","glacier","is","a huge","block of ice"],
+        tr:["Bir","buzul","devasa","bir buz kütlesidir"],
+        trMap:[0,1,3,4] },
+      { en:["I","enjoy","playing","the recorder"],
+        tr:["Ben","blok flüt çalmaktan","zevk alırım"],
+        trMap:[0,3,1] },
+      { en:["The","gardener","waters","the plants","every day"],
+        tr:["Bahçıvan","her gün","bitkileri","sular"],
+        trMap:[1,4,3,2] },
+      { en:["A","diamond","is","the hardest","stone"],
+        tr:["Bir","elmas","en sert","taştır"],
+        trMap:[0,1,3,4] },
+      { en:["The","librarian","helps us","find books"],
+        tr:["Kütüphaneci","kitap bulmamızda","yardımcı olur"],
+        trMap:[1,3,2] },
+      { en:["An","octopus","has","eight arms"],
+        tr:["Bir","ahtapotun","sekiz kolu","vardır"],
+        trMap:[0,1,3,2] },
+      { en:["I","draw","with","a pencil","and rubber"],
+        tr:["Ben","kalem","ve silgiyle","çizerim"],
+        trMap:[0,3,4,1] },
+      { en:["The","astronaut","travels","to space"],
+        tr:["Astronot","uzaya","yolculuk yapar"],
+        trMap:[1,3,2] },
+      { en:["A","cactus","grows","in the desert"],
+        tr:["Bir","kaktüs","çölde","yetişir"],
+        trMap:[0,1,3,2] },
+      { en:["The","nurse","takes care of","patients"],
+        tr:["Hemşire","hastalara","bakar"],
+        trMap:[1,3,2] },
+      { en:["A","magnet","attracts","metal objects"],
+        tr:["Bir","mıknatıs","metal nesneleri","çeker"],
+        trMap:[0,1,3,2] },
+      { en:["I","love","watching","shooting stars","at night"],
+        tr:["Ben","geceleri","kayan yıldızları","izlemeyi","severim"],
+        trMap:[0,4,3,2,1] },
+      { en:["The","acrobat","performs","amazing tricks"],
+        tr:["Akrobat","inanılmaz numaralar","sergiler"],
+        trMap:[1,3,2] },
+      { en:["A","fossil","is","the remains of","an old animal"],
+        tr:["Bir","fosil","eski bir hayvanın","kalıntısıdır"],
+        trMap:[0,1,4,3] },
+      { en:["The","geographer","studies","maps","and countries"],
+        tr:["Coğrafyacı","haritaları","ve ülkeleri","inceler"],
+        trMap:[1,3,4,2] },
+    ]
+  }
+};
+
+// ─────────────────────────────────────────────────────────────────────
+// STATE
+// ─────────────────────────────────────────────────────────────────────
+const state = {
+  topic: null,
+  idx: 0,
+  pool: [],    // word indices still in pool
+  answer: [],  // word indices placed by student
+  solved: false,
+  scoreCorrect: 0,
+  scoreTotal: 0,
+  solvedSet: new Set(),
+};
+
+function shuffle(arr) {
+  const a = [...arr];
+  for (let i = a.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [a[i], a[j]] = [a[j], a[i]];
+  }
+  return a;
+}
+
+// ─────────────────────────────────────────────────────────────────────
+// TABS
+// ─────────────────────────────────────────────────────────────────────
+function renderTabs() {
+  const row = document.getElementById('tabs-row');
+  row.innerHTML = '';
+  for (const key of Object.keys(TOPICS)) {
+    const t = TOPICS[key];
+    const btn = document.createElement('button');
+    btn.className = 'tab-btn' + (state.topic === key ? ' active' : '');
+    btn.dataset.topic = key;
+    btn.innerHTML = `${t.icon} ${t.label}`;
+    btn.onclick = () => selectTopic(key);
+    row.appendChild(btn);
+  }
+}
+
+function selectTopic(key) {
+  state.topic = key;
+  state.idx = 0;
+  state.solvedSet = new Set();
+  loadSentence(0);
+  renderTabs();
+}
+
+// ─────────────────────────────────────────────────────────────────────
+// LOAD SENTENCE
+// ─────────────────────────────────────────────────────────────────────
+function loadSentence(idx) {
+  const sents = TOPICS[state.topic].sentences;
+  state.idx = ((idx % sents.length) + sents.length) % sents.length;
+  const n = sents[state.idx].en.length;
+  state.pool = shuffle(Array.from({length: n}, (_, i) => i));
+  state.answer = [];
+  state.solved = false;
+  renderGame();
+}
+
+// ─────────────────────────────────────────────────────────────────────
+// RENDER GAME SHELL
+// ─────────────────────────────────────────────────────────────────────
+function renderGame() {
+  const topic = TOPICS[state.topic];
+  const total = topic.sentences.length;
+  const area = document.getElementById('game-area');
+
+  area.innerHTML = `
+    <div class="progress-wrap">
+      <div class="progress-fill" style="width:${((state.idx+1)/total)*100}%"></div>
+    </div>
+    <div class="game-top">
+      <div class="sentence-counter">📖 Cümle ${state.idx+1} / ${total}</div>
+      <div class="nav-buttons">
+        <button class="nav-btn hint-btn" onclick="doHint()">💡 İpucu</button>
+        <button class="nav-btn" onclick="prevSent()">← Önceki</button>
+        <button class="nav-btn" onclick="nextSent()">Sonraki →</button>
+      </div>
+    </div>
+    <div class="drop-zone" id="drop-zone">
+      <span class="placeholder-text" id="placeholder">Kelimelere tıklayarak cümleyi kur...</span>
+    </div>
+    <div class="word-pool" id="word-pool"></div>
+    <div class="translation-card">
+      <div class="translation-label">Çeviri</div>
+      <div id="tr-area"><span style="color:#c7d2fe;font-size:0.95rem;">✅ Cümleyi doğru kurduğunda çeviri burada görünür.</span></div>
+    </div>
+  `;
+
+  renderWords();
+}
+
+// ─────────────────────────────────────────────────────────────────────
+// RENDER WORDS
+// ─────────────────────────────────────────────────────────────────────
+function renderWords() {
+  const sent = TOPICS[state.topic].sentences[state.idx];
+  const dz = document.getElementById('drop-zone');
+  const pool = document.getElementById('word-pool');
+  if (!dz || !pool) return;
+
+  // clear answer words from drop zone
+  dz.querySelectorAll('.word-card').forEach(e => e.remove());
+  pool.innerHTML = '';
+
+  // placeholder visibility
+  const ph = document.getElementById('placeholder');
+  if (ph) ph.style.display = state.answer.length === 0 ? '' : 'none';
+
+  // pool
+  state.pool.forEach((wi, pi) => {
+    pool.appendChild(makeCard(sent.en[wi], wi, false, () => pool2answer(pi)));
+  });
+
+  // answer
+  state.answer.forEach((wi, ai) => {
+    dz.appendChild(makeCard(sent.en[wi], wi, true, () => answer2pool(ai)));
+  });
+}
+
+function makeCard(text, colorIdx, inAnswer, onClick) {
+  const col = C[colorIdx % C.length];
+  const div = document.createElement('div');
+  div.className = 'word-card' + (inAnswer ? ' in-answer' : '');
+  div.textContent = text;
+  div.style.borderColor = col;
+  div.style.color = inAnswer ? 'white' : col;
+  if (inAnswer) div.style.background = col;
+  div.onclick = onClick;
+  return div;
+}
+
+// ─────────────────────────────────────────────────────────────────────
+// MOVE
+// ─────────────────────────────────────────────────────────────────────
+function pool2answer(pi) {
+  state.answer.push(state.pool[pi]);
+  state.pool.splice(pi, 1);
+  renderWords();
+  checkAnswer();
+}
+
+function answer2pool(ai) {
+  state.pool.push(state.answer[ai]);
+  state.answer.splice(ai, 1);
+  state.solved = false;
+  document.getElementById('drop-zone')?.classList.remove('correct');
+  renderWords();
+  showTranslation(false);
+}
+
+// ─────────────────────────────────────────────────────────────────────
+// CHECK
+// ─────────────────────────────────────────────────────────────────────
+function checkAnswer() {
+  const sent = TOPICS[state.topic].sentences[state.idx];
+  if (state.answer.length !== sent.en.length) return;
+  const correct = state.answer.every((wi, pos) => wi === pos);
+  if (correct) {
+    state.solved = true;
+    document.getElementById('drop-zone')?.classList.add('correct');
+    if (!state.solvedSet.has(state.idx)) {
+      state.solvedSet.add(state.idx);
+      state.scoreCorrect++;
+      state.scoreTotal++;
+      updateScore();
+    }
+    showTranslation(true);
+    spawnConfetti();
+  }
+}
+
+// ─────────────────────────────────────────────────────────────────────
+// TRANSLATION  — natural TR order, color from EN index via trMap
+// ─────────────────────────────────────────────────────────────────────
+function showTranslation(show) {
+  const el = document.getElementById('tr-area');
+  if (!el) return;
+  if (!show) {
+    el.innerHTML = '<span style="color:#c7d2fe;font-size:0.95rem;">✅ Cümleyi doğru kurduğunda çeviri burada görünür.</span>';
+    return;
+  }
+
+  const sent = TOPICS[state.topic].sentences[state.idx];
+
+  // EN sentence (colored)
+  const enDiv = document.createElement('div');
+  enDiv.className = 'sentence-display';
+  sent.en.forEach((w, i) => {
+    const sp = document.createElement('span');
+    sp.className = 'w';
+    sp.textContent = w;
+    sp.style.color = C[i % C.length];
+    sp.style.background = C[i % C.length] + '18';
+    enDiv.appendChild(sp);
+  });
+
+  // divider
+  const hr = document.createElement('hr');
+  hr.className = 'divider';
+
+  // TR label
+  const trLabel = document.createElement('div');
+  trLabel.className = 'translation-label';
+  trLabel.style.marginBottom = '10px';
+  trLabel.textContent = '🇹🇷 Türkçe Çeviri';
+
+  // TR sentence — each word gets color of its mapped EN word
+  const trDiv = document.createElement('div');
+  trDiv.className = 'tr-display';
+  sent.tr.forEach((w, i) => {
+    const enIdx = sent.trMap[i];   // which EN word this maps to
+    const col = C[enIdx % C.length];
+    const sp = document.createElement('span');
+    sp.className = 'w';
+    sp.textContent = w;
+    sp.style.color = col;
+    sp.style.background = col + '18';
+    trDiv.appendChild(sp);
+  });
+
+  // legend: show color ↔ meaning pairs
+  const legendDiv = document.createElement('div');
+  legendDiv.className = 'legend-row';
+  legendDiv.style.marginTop = '14px';
+  legendDiv.innerHTML = '<div style="width:100%;font-size:0.72rem;font-weight:800;letter-spacing:1px;color:#aaa;text-transform:uppercase;margin-bottom:4px;">Renk Eşleşmeleri</div>';
+  sent.en.forEach((w, i) => {
+    const trIdx = sent.trMap.indexOf(i);
+    if (trIdx === -1) return;
+    const trWord = sent.tr[trIdx];
+    if (w === trWord) return; // skip identical words
+    const col = C[i % C.length];
+    const item = document.createElement('div');
+    item.className = 'legend-item';
+    item.style.color = col;
+    item.innerHTML = `<div class="legend-dot" style="background:${col}"></div><b>${w}</b> → <b>${trWord}</b>`;
+    legendDiv.appendChild(item);
+  });
+
+  // badge
+  const badge = document.createElement('div');
+  badge.className = 'success-badge';
+  badge.innerHTML = '🎉 Harika! Doğru!';
+
+  el.innerHTML = '';
+  el.appendChild(badge);
+  el.appendChild(enDiv);
+  el.appendChild(hr);
+  el.appendChild(trLabel);
+  el.appendChild(trDiv);
+  el.appendChild(legendDiv);
+}
+
+// ─────────────────────────────────────────────────────────────────────
+// NAVIGATION
+// ─────────────────────────────────────────────────────────────────────
+function nextSent() {
+  if (!state.solvedSet.has(state.idx)) { state.scoreTotal++; updateScore(); }
+  loadSentence(state.idx + 1);
+}
+function prevSent() { loadSentence(state.idx - 1); }
+
+function doHint() {
+  const sent = TOPICS[state.topic].sentences[state.idx];
+  const needed = state.answer.length; // next correct word index
+  const pi = state.pool.indexOf(needed);
+  if (pi !== -1) pool2answer(pi);
+}
+
+function updateScore() {
+  document.getElementById('score-correct').textContent = state.scoreCorrect;
+  document.getElementById('score-total').textContent = state.scoreTotal;
+}
+
+// ─────────────────────────────────────────────────────────────────────
+// CONFETTI
+// ─────────────────────────────────────────────────────────────────────
+function spawnConfetti() {
+  const cols = ['#667eea','#22c55e','#f59e0b','#ec4899','#3b82f6','#14b8a6'];
+  for (let i = 0; i < 22; i++) {
+    setTimeout(() => {
+      const p = document.createElement('div');
+      p.className = 'confetti-piece';
+      p.style.left = Math.random() * 100 + 'vw';
+      p.style.top = Math.random() * 40 + 'vh';
+      p.style.background = cols[i % cols.length];
+      p.style.animationDuration = (0.8 + Math.random() * 0.6) + 's';
+      document.body.appendChild(p);
+      setTimeout(() => p.remove(), 1600);
+    }, i * 35);
+  }
+}
+
+// ─────────────────────────────────────────────────────────────────────
+// INIT
+// ─────────────────────────────────────────────────────────────────────
+renderTabs();
+</script>
+</body>
+</html>
